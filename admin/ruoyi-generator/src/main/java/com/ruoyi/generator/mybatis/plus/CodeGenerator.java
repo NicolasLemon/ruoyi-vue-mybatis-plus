@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.generator.IFill;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
+import com.ruoyi.common.core.domain.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,14 +87,13 @@ public class CodeGenerator {
                             .entityBuilder()
                             // 开启链式模型
                             .enableChainModel()
-                            /*
+
                                 // 设置父类
                                 .superClass(BaseEntity.class)
                                 // 禁用生成 serialVersionUID
                                  .disableSerialVersionUID()
                                 // 添加父类公共字段
                                 .addSuperEntityColumns("create_by", "create_time", "update_by", "update_time")
-                             */
                             // 开启 lombok 模型
                             .enableLombok()
                             // 表字段填充
