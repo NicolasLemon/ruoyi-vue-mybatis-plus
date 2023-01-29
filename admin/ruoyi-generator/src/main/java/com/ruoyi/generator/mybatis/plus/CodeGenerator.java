@@ -52,12 +52,12 @@ public class CodeGenerator {
                     builder.author("Nicolas·Lemon")
                             // 注释日期
                             .commentDate("yyyy/MM/dd")
-                            // 开启 swagger 模式
-                            .enableSwagger()
+                            /// 开启 swagger 模式
+                            // .enableSwagger()
                             // 指定输出目录
                             .outputDir(javaOutputDir)
-                            /// 覆盖已有文件
-                            // .fileOverride()
+                            // 覆盖已有文件
+                            .fileOverride()
                             // 禁止打开输出目录
                             .disableOpenDir();
                 })
