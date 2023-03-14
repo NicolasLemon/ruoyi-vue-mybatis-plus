@@ -444,3 +444,27 @@ com.ruoyi
    ![](README.assets/2023-01-29-10-06-28-image.png)
    
    ![](README.assets/2023-01-29-10-08-08-image.png)
+
+# 新建maven工程
+
+假设新建一个`ruoyi-xxx`自定义的maven工程，需要在以下几个地方加入自己添加的依赖，不然Spring Boot接管不到
+
+1. **总**工程的`pom.xml`中引入自定义依赖
+   
+   ![](README.assets/2023-03-14-14-43-23-image.png)
+
+2. **ruoyi-framework**工程的`pom.xml`里引入自定义依赖
+   
+   ![](README.assets/2023-03-14-14-46-21-image.png)
+
+3. **自定义**工程的`pom.xml`中引入`ruoyi-common`模块
+   
+   ```xml
+   <!-- 通用工具-->
+   <dependency>
+       <groupId>com.ruoyi</groupId>
+       <artifactId>ruoyi-common</artifactId>
+   </dependency>
+   ```
+   
+   ![](README.assets/2023-03-14-14-49-53-image.png)
