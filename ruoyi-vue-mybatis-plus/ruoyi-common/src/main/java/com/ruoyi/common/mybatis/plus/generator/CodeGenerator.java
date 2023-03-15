@@ -1,4 +1,4 @@
-package com.ruoyi.generator.mybatis.plus;
+package com.ruoyi.common.mybatis.plus.generator;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.generator.IFill;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
+import com.ruoyi.common.core.domain.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class CodeGenerator {
 
         // 需要逆向生成的数据库的表名
         final String[] includeTables = {
-                "sys_user"
+                "diy_demo_user"
         };
 
         // 自动填充充字段
@@ -66,7 +67,7 @@ public class CodeGenerator {
                     // 设置父包名
                     builder.parent("com.lemon")
                             /// 设置父包模块名
-                            .moduleName("aaa")
+                            .moduleName("demo")
                             // 指定实体包名
                             .entity("domain")
                             // 设置mapperXml生成路径
@@ -86,14 +87,12 @@ public class CodeGenerator {
                             .entityBuilder()
                             // 开启链式模型
                             .enableChainModel()
-                            /*
-                                // 设置父类
-                                .superClass(BaseEntity.class)
-                                // 禁用生成 serialVersionUID
-                                 .disableSerialVersionUID()
-                                // 添加父类公共字段
-                                .addSuperEntityColumns("create_by", "create_time", "update_by", "update_time")
-                             */
+                            // 禁用生成 serialVersionUID
+                            .disableSerialVersionUID()
+                            // 设置父类
+                            .superClass(BaseEntity.class)
+                            // 添加父类公共字段
+                            .addSuperEntityColumns("create_by", "create_time", "update_by", "update_time", "remark")
                             // 开启 lombok 模型
                             .enableLombok()
                             // 表字段填充

@@ -12,6 +12,7 @@ com.ruoyi
 │       └── enums                         // 通用枚举
 │       └── exception                     // 通用异常
 │       └── filter                        // 过滤器处理
+│       └── mybatis.plus                  // MyBatis-Plus相关
 │       └── utils                         // 通用类处理
 ├── framework         // 框架核心
 │       └── aspectj                       // 注解实现
@@ -25,10 +26,10 @@ com.ruoyi
 ├── ruoyi-quartz      // 定时任务（可移除）
 ├── ruoyi-system      // 系统代码
 ├── ruoyi-admin       // 后台服务
-├── ruoyi-xxxxxx      // 其他模块
+├── ruoyi-xxxxxx      // 其他模块（自定义）
 ```
 
-# 整合笔记
+# 整合篇
 
 ## 引入依赖
 
@@ -123,17 +124,20 @@ com.ruoyi
 
 ## 自动填充
 
+在`ruoyi-common`工程中：
+
 1. 利用MyBatis-Plus的自动填充功能自动填充如`创建者、创建时间、更新者、更新时间`等字段
    
-   ![](README.assets/2023-01-29-09-40-53-image.png)
+   ![](README.assets/2023-03-15-11-08-31-image.png)
    
    `MybatisPlusMetaObjectHandler.java`
    
    ```java
-   package com.ruoyi.common.handler;
+   package com.ruoyi.common.mybatis.plus.handler;
    
    import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
    import com.ruoyi.common.utils.SecurityUtils;
+   import lombok.extern.slf4j.Slf4j;
    import org.apache.ibatis.reflection.MetaObject;
    import org.springframework.stereotype.Component;
    
@@ -145,12 +149,14 @@ com.ruoyi
     * @author Nicolas·Lemon
     * @since 2022/05/13
     */
+   @Slf4j
    @Component
    public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
    
        @Override
        public void insertFill(MetaObject metaObject) {
            /// 插入一条记录时的自动填充
+           log.info("start insert fill ....");
            String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
            // 创建者
            this.setFieldValByName("createBy", thisLoginUsername, metaObject);
@@ -161,303 +167,312 @@ com.ruoyi
            // 更新时间 起始版本 3.3.3(推荐)
            this.strictInsertFill(metaObject, "updateTime", LocalDateTime::now, LocalDateTime.class);
        }
+   
+      @Override
+      public void updateFill(MetaObject metaObject) {
+          // 更新一条记录时的自动填充
+          log.info("start update fill ....");
+          String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
+          // 更新者
+          this.setFieldValByName("updateBy", thisLoginUsername, metaObject);
+          // 更新时间 起始版本 3.3.3(推荐)
+          this.strictUpdateFill(metaObject, "updateTime", LocalDateTime::now, LocalDateTime.class);
+      }
    ```
 
 2. 修改`BaseEntity.java`
-   
-   ![](README.assets/2023-01-29-09-50-39-image.png)
-   
-   ```java
-   package com.ruoyi.common.core.domain;
-   
-   import java.io.Serializable;
-   import java.time.LocalDateTime;
-   import java.util.Date;
-   import java.util.HashMap;
-   import java.util.Map;
-   
-   import com.baomidou.mybatisplus.annotation.FieldFill;
-   import com.baomidou.mybatisplus.annotation.TableField;
-   import com.fasterxml.jackson.annotation.JsonFormat;
-   import com.fasterxml.jackson.annotation.JsonIgnore;
-   import com.fasterxml.jackson.annotation.JsonInclude;
-   import lombok.Getter;
-   import lombok.Setter;
-   
-   /**
-    * Entity基类
-    *
-    * @author ruoyi，Nicolas·Lemon
-    */
-   public class BaseEntity implements Serializable {
-       private static final long serialVersionUID = 1L;
-   
-       /**
-        * 搜索值
-        */
-       @JsonIgnore
-       @TableField(exist = false)
-       private String searchValue;
-   
-       /**
-        * 创建者
-        */
-       @TableField(fill = FieldFill.INSERT)
-       private String createBy;
-   
-       /**
-        * 创建时间
-        */
-       @Getter
-       @Setter
-       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-       @TableField(fill = FieldFill.INSERT)
-       private LocalDateTime createTime;
-   
-       /**
-        * 更新者
-        */
-       @TableField(fill = FieldFill.INSERT_UPDATE)
-       private String updateBy;
-   
-       /**
-        * 更新时间
-        */
-       @Getter
-       @Setter
-       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-       @TableField(fill = FieldFill.INSERT_UPDATE)
-       private LocalDateTime updateTime;
-   
-       /**
-        * 备注
-        */
-       @TableField(exist = false)
-       private String remark;
-   
-       /**
-        * 请求参数
-        */
-       @JsonInclude(JsonInclude.Include.NON_EMPTY)
-       @TableField(exist = false)
-       private Map<String, Object> params;
-   
-       public String getSearchValue() {
-           return searchValue;
-       }
-   
-       public void setSearchValue(String searchValue) {
-           this.searchValue = searchValue;
-       }
-   
-       public String getCreateBy() {
-           return createBy;
-       }
-   
-       public void setCreateBy(String createBy) {
-           this.createBy = createBy;
-       }
-   
-       public String getUpdateBy() {
-           return updateBy;
-       }
-   
-       public void setUpdateBy(String updateBy) {
-           this.updateBy = updateBy;
-       }
-   
-       public String getRemark() {
-           return remark;
-       }
-   
-       public void setRemark(String remark) {
-           this.remark = remark;
-       }
-   
-       public Map<String, Object> getParams() {
-           if (params == null) {
-               params = new HashMap<>();
-           }
-           return params;
-       }
-   
-       public void setParams(Map<String, Object> params) {
-           this.params = params;
-       }
-   }
-   ```
+
+![](README.assets/2023-01-29-09-50-39-image.png)
+
+`BaseEntity.java`
+
+```java
+package com.ruoyi.common.core.domain;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Entity基类
+ *
+ * @author ruoyi，Nicolas·Lemon
+ */
+public class BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 搜索值
+     */
+    @JsonIgnore
+    @TableField(exist = false)
+    private String searchValue;
+
+    /**
+     * 创建者
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private String createBy;
+
+    /**
+     * 创建时间
+     */
+    @Getter
+    @Setter
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    /**
+     * 更新者
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String updateBy;
+
+    /**
+     * 更新时间
+     */
+    @Getter
+    @Setter
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    /**
+     * 备注
+     */
+    @TableField(exist = false)
+    private String remark;
+
+    /**
+     * 请求参数
+     */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
+
+    public String getSearchValue() {
+        return searchValue;
+    }
+
+    public void setSearchValue(String searchValue) {
+        this.searchValue = searchValue;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Map<String, Object> getParams() {
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        return params;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
+    }
+}
+```
 
 ## 代码生成
 
-在`ruoyi-generator`工程中配置
+在`ruoyi-common`工程中配置
 
-1. 引入MySQL驱动依赖
-   
-   `pom.xml`
-   
-   ![](README.assets/2023-01-29-10-01-58-image.png)
-   
-   ```xml
-   <!-- Mysql驱动包 -->
-   <dependency>
-       <groupId>mysql</groupId>
-       <artifactId>mysql-connector-java</artifactId>
-   </dependency>
-   ```
+![](README.assets/2023-03-15-11-21-40-image.png)
 
-2. 代码生成器
-   
-   ![](README.assets/2023-01-29-10-03-51-image.png)
-   
-   `CodeGenerator.java`
-   
-   ```java
-   package com.ruoyi.generator.mybatis.plus;
-   
-   import com.baomidou.mybatisplus.annotation.FieldFill;
-   import com.baomidou.mybatisplus.generator.FastAutoGenerator;
-   import com.baomidou.mybatisplus.generator.IFill;
-   import com.baomidou.mybatisplus.generator.config.OutputFile;
-   import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
-   import com.baomidou.mybatisplus.generator.fill.Column;
-   
-   import java.util.ArrayList;
-   import java.util.Collections;
-   import java.util.List;
-   
-   /**
-    * MyBatis-Plus 代码生成器
-    *
-    * @author Nicolas·Lemon
-    * @since 2022/05/09
-    */
-   public class CodeGenerator {
-   
-       public static void main(String[] args) {
-           /// 设置生成文件的输出目录
-           final String parentPath = "D:";
-           // java文件输出目录
-           final String javaOutputDir = parentPath + "\\MybatisPlusCodeGenerator\\java";
-           // mapperXml文件输出目录
-           final String xmlOutputDir = parentPath + "\\MybatisPlusCodeGenerator\\resources\\mapper";
-   
-           // 需要逆向生成的数据库的表名
-           final String[] includeTables = {
-                   "sys_user"
-           };
-   
-           // 自动填充充字段
-           List<IFill> tableFills = new ArrayList<>();
-           // 创建者
-           tableFills.add(new Column("create_by", FieldFill.INSERT));
-           // 创建时间
-           tableFills.add(new Column("create_time", FieldFill.INSERT));
-           // 更新者
-           tableFills.add(new Column("update_by", FieldFill.INSERT_UPDATE));
-           // 更新时间
-           tableFills.add(new Column("update_time", FieldFill.INSERT_UPDATE));
-   
-           // 快速生成模板
-           FastAutoGenerator.create("jdbc:mysql://localhost:3306/ry_vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8"
-                           , "root", "root")
-                   // 全局配置
-                   .globalConfig(builder -> {
-                       // 设置作者
-                       builder.author("Nicolas·Lemon")
-                               // 注释日期
-                               .commentDate("yyyy/MM/dd")
-                               // 开启 swagger 模式
-                               .enableSwagger()
-                               // 指定输出目录
-                               .outputDir(javaOutputDir)
-                               /// 覆盖已有文件
-                               // .fileOverride()
-                               // 禁止打开输出目录
-                               .disableOpenDir();
-                   })
-                   // 包配置
-                   .packageConfig(builder -> {
-                       // 设置父包名
-                       builder.parent("com.lemon")
-                               /// 设置父包模块名
-                               .moduleName("aaa")
-                               // 指定实体包名
-                               .entity("domain")
-                               // 设置mapperXml生成路径
-                               .pathInfo(Collections.singletonMap(OutputFile.mapperXml, xmlOutputDir));
-                   })
-                   // 策略配置
-                   .strategyConfig(builder -> {
-                       // 设置需要生成的表名（包含）
-                       builder.addInclude(includeTables)
-                               // 设置过滤表前缀
-                               .addTablePrefix("t_", "c_")
-                               // Controller策略配置
-                               .controllerBuilder()
-                               // 开启生成@RestController控制器
-                               .enableRestStyle()
-                               // Entity策略配置
-                               .entityBuilder()
-                               // 开启链式模型
-                               .enableChainModel()
-                               /*
-                                   // 设置父类
-                                   .superClass(BaseEntity.class)
-                                   // 禁用生成 serialVersionUID
-                                    .disableSerialVersionUID()
-                                   // 添加父类公共字段
-                                   .addSuperEntityColumns("create_by", "create_time", "update_by", "update_time")
-                                */
-                               // 开启 lombok 模型
-                               .enableLombok()
-                               // 表字段填充
-                               .addTableFills(tableFills)
-                               // 逻辑删除字段名(数据库)
-                               .logicDeleteColumnName("del_flag")
-                               // 逻辑删除属性名(实体)
-                               .logicDeletePropertyName("delFlag")
-                               // Service策略配置
-                               .serviceBuilder()
-                               // 去掉Service的I前缀
-                               .formatServiceFileName("%sService")
-                               // Mapper策略配置
-                               .mapperBuilder()
-                               // 开启 @Mapper 注解
-                               .enableMapperAnnotation()
-                               // 开启通用查询映射结果
-                               .enableBaseResultMap()
-                               // 开启通用查询结果列
-                               .enableBaseColumnList();
-   
-                   })
-                   // 使用Velocity引擎模板
-                   .templateEngine(new VelocityTemplateEngine())
-                   // 执行配置
-                   .execute();
-   
-       }
-   }
-   ```
-   
+ `CodeGenerator.java`
+
+```java
+package com.ruoyi.common.mybatis.plus.generator;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.generator.FastAutoGenerator;
+import com.baomidou.mybatisplus.generator.IFill;
+import com.baomidou.mybatisplus.generator.config.OutputFile;
+import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+import com.baomidou.mybatisplus.generator.fill.Column;
+import com.ruoyi.common.core.domain.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * MyBatis-Plus 代码生成器
+ *
+ * @author Nicolas·Lemon
+ * @since 2022/05/09
+ */
+public class CodeGenerator {
+
+    public static void main(String[] args) {
+        /// 设置生成文件的输出目录
+        final String parentPath = "D:";
+        // java文件输出目录
+        final String javaOutputDir = parentPath + "\\MybatisPlusCodeGenerator\\java";
+        // mapperXml文件输出目录
+        final String xmlOutputDir = parentPath + "\\MybatisPlusCodeGenerator\\resources\\mapper";
+
+        // 需要逆向生成的数据库的表名
+        final String[] includeTables = {
+                "diy_demo_user"
+        };
+
+        // 自动填充充字段
+        List<IFill> tableFills = new ArrayList<>();
+        // 创建者
+        tableFills.add(new Column("create_by", FieldFill.INSERT));
+        // 创建时间
+        tableFills.add(new Column("create_time", FieldFill.INSERT));
+        // 更新者
+        tableFills.add(new Column("update_by", FieldFill.INSERT_UPDATE));
+        // 更新时间
+        tableFills.add(new Column("update_time", FieldFill.INSERT_UPDATE));
+
+        // 快速生成模板
+        FastAutoGenerator.create("jdbc:mysql://localhost:3306/ry_vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8"
+                        , "root", "root")
+                // 全局配置
+                .globalConfig(builder -> {
+                    // 设置作者
+                    builder.author("Nicolas·Lemon")
+                            // 注释日期
+                            .commentDate("yyyy/MM/dd")
+                            /// 开启 swagger 模式
+                            // .enableSwagger()
+                            // 指定输出目录
+                            .outputDir(javaOutputDir)
+                            // 覆盖已有文件
+                            .fileOverride()
+                            // 禁止打开输出目录
+                            .disableOpenDir();
+                })
+                // 包配置
+                .packageConfig(builder -> {
+                    // 设置父包名
+                    builder.parent("com.lemon")
+                            /// 设置父包模块名
+                            .moduleName("demo")
+                            // 指定实体包名
+                            .entity("domain")
+                            // 设置mapperXml生成路径
+                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml, xmlOutputDir));
+                })
+                // 策略配置
+                .strategyConfig(builder -> {
+                    // 设置需要生成的表名（包含）
+                    builder.addInclude(includeTables)
+                            // 设置过滤表前缀
+                            .addTablePrefix("t_", "c_")
+                            // Controller策略配置
+                            .controllerBuilder()
+                            // 开启生成@RestController控制器
+                            .enableRestStyle()
+                            // Entity策略配置
+                            .entityBuilder()
+                            // 开启链式模型
+                            .enableChainModel()
+                            // 禁用生成 serialVersionUID
+                            .disableSerialVersionUID()
+                            // 设置父类
+                            .superClass(BaseEntity.class)
+                            // 添加父类公共字段
+                            .addSuperEntityColumns("create_by", "create_time", "update_by", "update_time", "remark")
+                            // 开启 lombok 模型
+                            .enableLombok()
+                            // 表字段填充
+                            .addTableFills(tableFills)
+                            // 逻辑删除字段名(数据库)
+                            .logicDeleteColumnName("del_flag")
+                            // 逻辑删除属性名(实体)
+                            .logicDeletePropertyName("delFlag")
+                            // Service策略配置
+                            .serviceBuilder()
+                            // 去掉Service的I前缀
+                            .formatServiceFileName("%sService")
+                            // Mapper策略配置
+                            .mapperBuilder()
+                            // 开启 @Mapper 注解
+                            .enableMapperAnnotation()
+                            // 开启通用查询映射结果
+                            .enableBaseResultMap()
+                            // 开启通用查询结果列
+                            .enableBaseColumnList();
+
+                })
+                // 使用Velocity引擎模板
+                .templateEngine(new VelocityTemplateEngine())
+                // 执行配置
+                .execute();
+
+    }
+}
+```
+
    测试代码生成器
-   
-   ![](README.assets/2023-01-29-10-06-28-image.png)
-   
-   ![](README.assets/2023-01-29-10-08-08-image.png)
 
-# 新建maven工程
+![](README.assets/2023-01-29-10-06-28-image.png)
 
-假设新建一个`ruoyi-xxx`自定义的maven工程，需要在以下几个地方加入自己添加的依赖，不然Spring Boot接管不到
+![](README.assets/2023-01-29-10-08-08-image.png)
 
-1. **总**工程的`pom.xml`中引入自定义依赖
+# 工程篇
+
+## 注意
+
+若依工程自带token鉴权，如果不登录前端，只用后端测试的话，需要在`ruoyi-framework`工程里的`SecurityConfig`中放行请求接口，不然接口会被拦截的；或者利用SpringBootTest+JUnit来进行测试（这步我没研究出来，目前是有报错的）
+
+![](README.assets/2023-03-15-15-50-37-image.png)
+
+利用测试类目前是报错的（有木有大神帮忙看看哈）：
+
+![](README.assets/2023-03-15-15-45-28-image.png)
+
+## 新建maven工程
+
+假设新建一个`ruoyi-lemon-demo`的自定义maven工程，需要在以下几个地方加入自己添加的依赖，不然Spring Boot接管不到
+
+1. **总**工程的`pom.xml`中引入自定义工程的依赖
    
-   ![](README.assets/2023-03-14-14-43-23-image.png)
+   ![](README.assets/2023-03-15-11-23-13-image.png)
 
-2. **ruoyi-framework**工程的`pom.xml`里引入自定义依赖
+2. **ruoyi-framework**工程的`pom.xml`里引入自定义工程的依赖
    
-   ![](README.assets/2023-03-14-14-46-21-image.png)
+   ![](README.assets/2023-03-15-11-24-00-image.png)
 
 3. **自定义**工程的`pom.xml`中引入`ruoyi-common`模块
+   
+   ![](README.assets/2023-03-15-11-25-00-image.png)
    
    ```xml
    <!-- 通用工具-->
@@ -466,5 +481,58 @@ com.ruoyi
        <artifactId>ruoyi-common</artifactId>
    </dependency>
    ```
+
+## 自定义包名
+
+框架工程中是`com.ruoyi`的包名，如果想用自定义包名`com.lemon`，则需要做出适当修改，不然工程无法扫描到包
+
+1. `ruoyi-admin`工程的spring配置文件文件中，mybatis-plus配置中加入新的包
    
-   ![](README.assets/2023-03-14-14-49-53-image.png)
+   ![](README.assets/2023-03-15-11-28-50-image.png)
+   
+   ```yml
+   # 搜索指定包别名
+   type-aliases-package: com.ruoyi.**.domain,com.lemon.**.domain
+   ```
+
+2. `ruoyi-framework`工程中需要修改对应的`ApplicationConfig.java`工程配置类，添加自己新的包
+   
+   ![](README.assets/2023-03-15-11-32-03-image.png)
+   
+   `ApplicationConfig.java`
+   
+   ```java
+   package com.ruoyi.framework.config;
+   
+   import java.util.TimeZone;
+   
+   import org.mybatis.spring.annotation.MapperScan;
+   import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+   import org.springframework.context.annotation.Bean;
+   import org.springframework.context.annotation.ComponentScan;
+   import org.springframework.context.annotation.Configuration;
+   import org.springframework.context.annotation.EnableAspectJAutoProxy;
+   
+   /**
+    * 程序注解配置
+    *
+    * @author ruoyi
+    */
+   @Configuration
+   // 表示通过aop框架暴露该代理对象,AopContext能够访问
+   @EnableAspectJAutoProxy(exposeProxy = true)
+   // 指定要扫描的Mapper类的包的路径
+   @MapperScan({"com.ruoyi.**.mapper", "com.lemon.**.mapper"})
+   // 指定要扫描的组件类的包的路径
+   @ComponentScan({"com.lemon", "com.ruoyi"})
+   public class ApplicationConfig {
+       /**
+        * 时区配置
+        */
+       @Bean
+       public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
+           return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(TimeZone.getDefault());
+       }
+   }
+   
+   ```

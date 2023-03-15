@@ -112,13 +112,13 @@ mybatis-plus:
       logic-not-delete-value: 0
     banner: false
   # 搜索指定包别名
-  type-aliases-package: com.ruoyi.**.domain
+  type-aliases-package: com.ruoyi.**.domain,com.lemon.**.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   configuration:
     # 指定 MyBatis 所用日志的具体实现
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     # 使用驼峰命名法转换字段
     map-underscore-to-camel-case: true
     # 使全局的映射器启用或禁用缓存
