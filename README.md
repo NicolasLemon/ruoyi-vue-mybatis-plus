@@ -309,6 +309,16 @@ public class BaseEntity implements Serializable {
 
 在`ruoyi-common`工程中配置
 
+1. pom文件中添加MySQL驱动包依赖
+   
+   ```xml
+   <!-- MySQL驱动包 -->
+   <dependency>
+       <groupId>mysql</groupId>
+       <artifactId>mysql-connector-java</artifactId>
+   </dependency>
+   ```
+
 ![](README.assets/2023-03-15-11-21-40-image.png)
 
  `CodeGenerator.java`
@@ -450,13 +460,47 @@ public class CodeGenerator {
 
 ## 注意
 
-若依工程自带token鉴权，如果不登录前端，只用后端测试的话，需要在`ruoyi-framework`工程里的`SecurityConfig`中放行请求接口，不然接口会被拦截的；或者利用SpringBootTest+JUnit来进行测试（这步我没研究出来，目前是有报错的）
+若依工程自带token鉴权，如果不登录前端，只用后端测试的话，需要在`ruoyi-framework`工程里的`SecurityConfig`中放行请求接口，不然接口会被拦截的；或者利用SpringBootTest+JUnit来进行测试
 
 ![](README.assets/2023-03-15-15-50-37-image.png)
 
-利用测试类目前是报错的（有木有大神帮忙看看哈）：
+注意：利用测试类的话，需要如下配置，不然就会报错的：
 
 ![](README.assets/2023-03-15-15-45-28-image.png)
+
+![](README.assets/2023-03-17-14-22-03-image.png)
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = RuoYiApplication.class)
+@ComponentScan(basePackages = {"com.ruoyi", "com.lemon"})
+```
+
+`pom.xml`
+
+```xml
+<!-- junit4单元测试 -->
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.1</version>
+        <scope>test</scope>
+    </dependency>
+
+<!-- Spring Boot 测试 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+    </dependency>
+
+<!-- 添加Spring Boot测试的若依启动类 -->
+    <dependency>
+        <groupId>com.ruoyi</groupId>
+        <artifactId>ruoyi-admin</artifactId>
+        <version>${ruoyi.version}</version>
+        <scope>test</scope>
+    </dependency>
+```
 
 ## 新建maven工程
 
@@ -534,5 +578,137 @@ public class CodeGenerator {
            return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(TimeZone.getDefault());
        }
    }
-   
    ```
+
+## MP联表查询
+
+有两张表，一张`diy_user`用户表，一张`diy_user_area`用户区域表，这两张表通过`area_id`区域id外键连接，简化sql，用MyBatis-Plus，只查询用户表，就把用户区域表中的内容给一对一带出来。
+
+![](README.assets/2023-03-17-15-43-23-image.png)
+
+![](README.assets/2023-03-17-16-01-44-image.png)
+
+上面用户区域实体中还包含一个`areaIntroduction` 区域简介 的字段，这里用不着，是下面AOP切面增强的内容，这里无需纠结
+
+1. 用户表实体中包含用户区域实体
+   
+   ![](README.assets/2023-03-17-15-52-30-image.png)
+
+2. 利用`@Results`注解映射两实体之间的关系，除了有`@One`，还有`@Many`，区分应用场景哈，这里用户与区域的关系是设定的一对一
+   
+   ![](README.assets/2023-03-17-15-57-02-image.png)
+   
+   就可以了，是不是比纯用MyBatis简单
+
+## AOP切面增强
+
+还是上面那两张表，假设现在有个无聊的想法，在上述联合查询中，用户区域数据表中没有`区域简介`字段，但是我想对用户区域表中的内容做点增强处理，给查询到的结果自动加上对应的区域简介
+
+![](README.assets/2023-03-17-15-43-23-image.png)
+
+![](README.assets/2023-03-17-16-11-23-image.png)
+
+1. 自定义一个aop织入点接口注解
+   
+   这里仅仅只当作aop切入点，所以我将接口放在`ruoyi-common`工程中的`annotation`文件夹中
+   
+   ![](README.assets/2023-03-17-16-15-54-image.png)
+   
+   `MapperEnhancement.java`
+   
+   ```java
+   package com.ruoyi.common.annotation;
+   
+   import java.lang.annotation.*;
+   
+   /**
+    * Mapper增强注解
+    * 只当切入点
+    *
+    * @author 尼古拉斯·柠檬
+    * @since 2023/3/16
+    */
+   @Target(ElementType.METHOD)
+   @Retention(RetentionPolicy.RUNTIME)
+   @Documented
+   public @interface MapperEnhancement {
+   }
+   ```
+
+2. 自定义aop切面
+   
+   这里只展示结构，具体业务处理可以参考工程代码（在自定义工程中）
+   
+   ![](README.assets/2023-03-17-16-21-46-image.png)
+   
+   `DiyDemoMapperAspect.java`
+   
+   ```java
+   package com.lemon.demo.aspect;
+   
+   import lombok.extern.slf4j.Slf4j;
+   import org.aspectj.lang.ProceedingJoinPoint;
+   import org.aspectj.lang.annotation.Around;
+   import org.aspectj.lang.annotation.Aspect;
+   import org.aspectj.lang.annotation.Pointcut;
+   import org.aspectj.lang.reflect.MethodSignature;
+   import org.springframework.stereotype.Component;
+   
+   import java.lang.reflect.Method;
+   import java.util.List;
+   
+   /**
+    * AOP切面增强
+    * 对自定义Demo中Mapper的查询结果做增强处理
+    *
+    * @author 尼古拉斯·柠檬
+    * @since 2023/3/16
+    */
+   @Aspect
+   @Component
+   @Slf4j
+   public class DiyDemoMapperAspect {
+   
+       /**
+        * 切点：在Mapper方法上使用注解 @MapperEnhancement
+        */
+       @Pointcut("@annotation(com.ruoyi.common.annotation.MapperEnhancement)")
+       public void mapperPointcut() {
+       }
+   
+       /**
+        * DiyUserMapper环绕增强
+        * 双重条件锁定：
+        * 1、在Mapper方法上使用@MapperEnhancement注解
+        * 2、注解只有在DiyUserMapper中才切入此方法
+        */
+       @Around("mapperPointcut() && execution(* com.lemon.demo.mapper.DiyUserMapper.*(..))")
+       public Object aroundDiyUserMapper(ProceedingJoinPoint joinPoint) throws Throwable {
+           // 获取切入的方法名称
+           MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+           Method signatureMethod = signature.getMethod();
+           log.info("开启 " + signatureMethod + " 方法环绕型增强");
+           // 下一步是正常处理，获取返回的结果
+           Object result = joinPoint.proceed();
+           // 判断结果是List集合还是Object对象
+           if (result instanceof List) {
+               // 增强用户区域实体对象，赋值区域简介
+               for (Object object : (List) result) {
+                   /** 这里做增强处理 */
+               }
+               return result;
+           }
+           // 增强用户区域实体对象，赋值区域简介
+           /** 这里做增强处理 */
+           return result;
+       }
+   }
+   ```
+
+3. 在所需要的Mapper中加入自定义的切入点注解
+   
+   这里是在上面联表查询的用户Mapper中切入的
+   
+   ![](README.assets/2023-03-17-16-27-15-image.png)
+   
+   就可以自动进行切入了，以后就不用在业务调用中，再去手动处理了
