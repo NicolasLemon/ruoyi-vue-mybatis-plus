@@ -30,7 +30,7 @@ public class CodeGenerator {
 
         // 需要逆向生成的数据库的表名
         final String[] includeTables = {
-                "diy_demo_user"
+                "diy_user"
         };
 
         // 自动填充充字段

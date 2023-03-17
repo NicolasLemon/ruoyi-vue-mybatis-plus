@@ -22,7 +22,9 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         /// 插入一条记录时的自动填充
         log.info("start insert fill ....");
-        String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
+        /// 不带token的话，就无法获取到当前登录的用户信息的，所以这边先注释掉
+        // String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
+        String thisLoginUsername = "Nicolas·Lemon";
         // 创建者
         this.setFieldValByName("createBy", thisLoginUsername, metaObject);
         // 创建时间 起始版本 3.3.3(推荐)
@@ -38,7 +40,9 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         // 更新一条记录时的自动填充
         log.info("start update fill ....");
-        String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
+        /// 不带token的话，就无法获取到当前登录的用户信息的，所以这边先注释掉
+        // String thisLoginUsername = SecurityUtils.getLoginUser().getUsername();
+        String thisLoginUsername = "Nicolas·Lemon";
         // 更新者
         this.setFieldValByName("updateBy", thisLoginUsername, metaObject);
         // 更新时间 起始版本 3.3.3(推荐)
