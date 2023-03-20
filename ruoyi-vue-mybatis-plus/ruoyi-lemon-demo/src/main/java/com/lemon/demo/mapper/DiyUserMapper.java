@@ -29,9 +29,14 @@ public interface DiyUserMapper extends BaseMapper<DiyUser> {
                     one = @One(select = "com.lemon.demo.mapper.DiyUserAreaMapper.selectById"))
     })
     @MapperEnhancement
-    // 用了 @Results 映射后得自己重写一遍最基本的sql，不然会报错
-    @Select("select * from diy_user;")
-    List<DiyUser> selectList(Wrapper<DiyUser> queryWrapper);
+    /*
+        用了 @Results 映射后得自己重写一遍最基本的sql，不然会报错
+        注：为沿用MP插件的Wrapper，根据源码里提供的信息，加上：
+        1、${ew.customSqlSegment} （不需要where）
+        2、@Param("ew") （ew不能更改成其它）
+     */
+    @Select("select * from diy_user ${ew.customSqlSegment};")
+    List<DiyUser> selectList(@Param("ew") Wrapper<DiyUser> queryWrapper);
 
     /**
      * 通过用户id查询用户

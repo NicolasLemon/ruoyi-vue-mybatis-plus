@@ -590,6 +590,18 @@ public class CodeGenerator {
 
 上面用户区域实体中还包含一个`areaIntroduction` 区域简介 的字段，这里用不着，是下面AOP切面增强的内容，这里无需纠结
 
+**注意：** 根据MP插件源码提供的信息，若在下面需要沿用其自带的`wrapper`，则需要在自定义sql的地方加上`${ew.customSqlSegment}`和`@Param("ew")`，
+
+代码中已更正！
+
+源码里的：
+
+![](README.assets/2023-03-20-21-39-31-image.png)
+
+自己的代码：
+
+![](README.assets/2023-03-20-21-38-51-image.png)
+
 1. 用户表实体中包含用户区域实体
    
    ![](README.assets/2023-03-17-15-52-30-image.png)
