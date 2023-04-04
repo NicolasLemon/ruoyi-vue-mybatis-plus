@@ -44,4 +44,15 @@ public class DiyUserArea implements Serializable {
     @TableField(exist = false)
     private String areaIntroduction;
 
+    /*
+        *********************
+         以下是演示生成pdf所需
+        *********************
+     */
+
+    public DiyUserArea(Long areaId, String areaName) {
+        this.areaId = areaId;
+        this.areaName = areaName;
+    }
+
 }

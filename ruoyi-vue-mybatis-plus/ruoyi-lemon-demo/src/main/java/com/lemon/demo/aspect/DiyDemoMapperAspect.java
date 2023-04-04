@@ -24,6 +24,7 @@ import java.util.List;
 @Aspect
 @Component
 @Slf4j
+@SuppressWarnings("rawtypes")
 public class DiyDemoMapperAspect {
 
     /**

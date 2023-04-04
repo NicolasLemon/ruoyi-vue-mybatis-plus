@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.domain.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -45,4 +46,35 @@ public class DiyUser extends BaseEntity {
     @TableField(exist = false)
     private DiyUserArea userArea;
 
+    /*
+        *********************
+         以下是演示生成pdf所需
+        *********************
+     */
+
+    /**
+     * 用户爱好
+     */
+    @TableField(exist = false)
+    private String hobby;
+
+    /**
+     * 用户性别
+     */
+    @TableField(exist = false)
+    private String sex;
+
+    /**
+     * 用户年龄
+     */
+    @TableField(exist = false)
+    private Integer age;
+
+    public DiyUser(String userName, DiyUserArea userArea, String hobby, String sex, Integer age) {
+        this.userName = userName;
+        this.userArea = userArea;
+        this.hobby = hobby;
+        this.sex = sex;
+        this.age = age;
+    }
 }
