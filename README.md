@@ -724,3 +724,29 @@ public class CodeGenerator {
    ![](README.assets/2023-03-17-16-27-15-image.png)
    
    就可以自动进行切入了，以后就不用在业务调用中，再去手动处理了
+
+## PDF表格动态合并
+
+假设现在有一个需求：生成一个PDF文件，该PDF文件中包含一个5列n行的表格，表格第1列是`地区`，第2列是`爱好`、第3列是`姓名`、第4列是`性别`、第5列是`年龄`；每个地区有若干个人，假设每个人只有一个爱好，分区域统计相同爱好的人，并分别动态合并第1列和第2列中相同元素的单元格
+
+**效果图：**
+
+![](README.assets/2023-04-05-02-45-34-image.png)
+
+**实现：**
+
+利用itext7去完成该项设计，具体可参照工程中的代码：`ruoyi-lemon-demo`工程中的`PdfGeneratorUtils.java`，其调用方法在测试类`PdfGeneratorTest.java`中，其中有用到上面的用户实体类和用户区域实体类，可留意相关注释说明。
+
+注：在生成表格或者pdf的时候，不要使用奇奇怪怪的中文字符，避免程序无法正常生成pdf（会在document.close()这步中抛出空指针异常）。
+
+```xml
+<!-- 生成PDF所需核心依赖-->
+<dependency>
+    <groupId>com.itextpdf</groupId>
+    <artifactId>itext7-core</artifactId>
+    <version>7.2.5</version>
+    <type>pom</type>
+</dependency>
+```
+
+![](README.assets/2023-04-05-03-00-57-image.png)
