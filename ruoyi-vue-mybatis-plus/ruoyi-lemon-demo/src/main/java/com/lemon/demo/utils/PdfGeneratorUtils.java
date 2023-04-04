@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,10 +52,8 @@ public class PdfGeneratorUtils {
      */
     public static void generateUserPdf(List<DiyUser> userList, String pdfPath) throws IOException {
         // 先排序用户区域，再在用户区域排序的基础上排序爱好
-        userList = userList.stream()
-                .sorted(Comparator.comparing(user -> ((DiyUser) user).getUserArea().getAreaId())
-                        .thenComparing(user -> ((DiyUser) user).getHobby()))
-                .collect(Collectors.toList());
+        userList.sort(Comparator.comparing(user -> ((DiyUser) user).getUserArea().getAreaId())
+                        .thenComparing(user -> ((DiyUser) user).getHobby()));
 
         // 创建一个PdfWriter对象，用于写入PDF文件
         PdfWriter writer = new PdfWriter(pdfPath);
@@ -76,7 +73,7 @@ public class PdfGeneratorUtils {
         Text text = new Text("用户爱好统计表")
                 // 设置中文字体
                 .setFont(font);
-        document.add(new Paragraph(text));
+        document.add(new Paragraph(text).setTextAlignment(TextAlignment.CENTER));
 
         // 添加表格表头
         for (String title : TITLES) {
