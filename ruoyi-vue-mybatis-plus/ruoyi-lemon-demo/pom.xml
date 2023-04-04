@@ -28,18 +28,18 @@
         </dependency>
 
         <!-- Spring Boot 测试 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-test</artifactId>-->
+<!--        </dependency>-->
 
-        <!-- 添加Spring Boot测试的若依启动类 -->
-        <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-admin</artifactId>
-            <version>${ruoyi.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- 添加Spring Boot测试的若依启动类 不用测试类的话就注释掉，因为允许循环依赖会报错 -->
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-admin</artifactId>-->
+<!--            <version>${ruoyi.version}</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
         <!-- 生成PDF所需核心依赖-->
         <dependency>

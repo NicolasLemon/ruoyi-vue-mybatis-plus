@@ -4,7 +4,7 @@ package com.lemon.demo.controller;
 import com.lemon.demo.service.impl.DiyUserServiceImpl;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/demo/diy")
+@RequiredArgsConstructor
 public class DiyUserDemoController extends BaseController {
-    @Autowired
-    private DiyUserServiceImpl userService;
+    private final DiyUserServiceImpl userService;
 
     /**
      * 查询所有用户
