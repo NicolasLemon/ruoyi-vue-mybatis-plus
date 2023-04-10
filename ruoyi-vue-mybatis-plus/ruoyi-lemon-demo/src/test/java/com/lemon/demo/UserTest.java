@@ -1,7 +1,7 @@
 package com.lemon.demo;
 
-import com.lemon.demo.domain.DiyUser;
-import com.lemon.demo.service.impl.DiyUserServiceImpl;
+import com.lemon.demo.domain.User;
+import com.lemon.demo.service.impl.UserServiceImpl;
 //import com.ruoyi.RuoYiApplication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,12 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings("all")
-public class DiyUserTest {
-    private final DiyUserServiceImpl userService;
+public class UserTest {
+    private final UserServiceImpl userService;
 
     @Test
     public void myTest() {
-        List<DiyUser> userList = userService.list();
+        List<User> userList = userService.list();
         log.info("查询结果集：" + userList);
     }
 }

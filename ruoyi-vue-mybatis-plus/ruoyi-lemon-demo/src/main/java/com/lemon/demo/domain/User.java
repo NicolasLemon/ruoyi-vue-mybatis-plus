@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 @TableName("diy_user")
-public class DiyUser extends BaseEntity {
+public class User extends BaseEntity {
 
     /**
      * 用户ID（主键）
@@ -45,7 +45,7 @@ public class DiyUser extends BaseEntity {
      * 用户区域实体
      */
     @TableField(exist = false)
-    private DiyUserArea userArea;
+    private UserArea userArea;
 
     /*
         *********************
@@ -71,7 +71,7 @@ public class DiyUser extends BaseEntity {
     @TableField(exist = false)
     private Integer age;
 
-    public DiyUser(String userName, DiyUserArea userArea, String hobby, String sex, Integer age) {
+    public User(String userName, UserArea userArea, String hobby, String sex, Integer age) {
         this.userName = userName;
         this.userArea = userArea;
         this.hobby = hobby;

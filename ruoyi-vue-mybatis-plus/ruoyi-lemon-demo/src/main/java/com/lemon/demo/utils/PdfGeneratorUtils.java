@@ -13,7 +13,7 @@ import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import com.lemon.demo.domain.DiyUser;
+import com.lemon.demo.domain.User;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.IOException;
@@ -51,10 +51,10 @@ public class PdfGeneratorUtils {
      * @param userList 用户列表
      * @param pdfPath  生成pdf的地址
      */
-    public static void generateUserPdf(List<DiyUser> userList, String pdfPath) throws IOException {
+    public static void generateUserPdf(List<User> userList, String pdfPath) throws IOException {
         // 先排序用户区域，再在用户区域排序的基础上排序爱好
-        userList.sort(Comparator.comparing(user -> ((DiyUser) user).getUserArea().getAreaId())
-                .thenComparing(user -> ((DiyUser) user).getHobby()));
+        userList.sort(Comparator.comparing(user -> ((User) user).getUserArea().getAreaId())
+                .thenComparing(user -> ((User) user).getHobby()));
 
         // 创建一个PdfWriter对象，用于写入PDF文件
         PdfWriter writer = new PdfWriter(pdfPath);
@@ -87,13 +87,13 @@ public class PdfGeneratorUtils {
         // 分 用户区域 填写表格内容
         for (int i = 0; i < userList.size(); i++) {
             // 子用户列表：该List中，只包含相同区域的子用户
-            List<DiyUser> subUserList = new ArrayList<>();
+            List<User> subUserList = new ArrayList<>();
             // 获取当前用户
-            DiyUser user = userList.get(i);
+            User user = userList.get(i);
             // 从当前区域的用户循环到下一个区域的用户
             for (int j = i; j < userList.size(); j++) {
                 // 获取当前子用户
-                DiyUser subUser = userList.get(j);
+                User subUser = userList.get(j);
                 // 当子用户的区域与当前主用户的区域不一致时，跳出循环
                 if (!subUser.getUserArea().getAreaId().equals(user.getUserArea().getAreaId())) {
                     break;
@@ -123,12 +123,12 @@ public class PdfGeneratorUtils {
      * @param table    表格对象
      * @param font     字体
      */
-    private static void createTableCellByUserArea(List<DiyUser> userList, Table table, PdfFont font) {
+    private static void createTableCellByUserArea(List<User> userList, Table table, PdfFont font) {
         for (int i = 0; i < userList.size(); i++) {
             // 获取当前用户
-            DiyUser user = userList.get(i);
+            User user = userList.get(i);
             // 获取上一个用户
-            DiyUser prevUser = i > 0 ? userList.get(i - 1) : null;
+            User prevUser = i > 0 ? userList.get(i - 1) : null;
 
             // 合并添加 用户区域 单元格
             if (ObjectUtils.isEmpty(prevUser)) {

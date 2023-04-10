@@ -1,6 +1,6 @@
 package com.lemon.demo.mapper;
 
-import com.lemon.demo.domain.DiyUserArea;
+import com.lemon.demo.domain.UserArea;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,5 +15,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023/03/16
  */
 @Mapper
-public interface DiyUserAreaMapper extends BaseMapper<DiyUserArea> {
+public interface UserAreaMapper extends BaseMapper<UserArea> {
 }

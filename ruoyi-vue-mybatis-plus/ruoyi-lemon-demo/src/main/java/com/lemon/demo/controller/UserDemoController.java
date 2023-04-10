@@ -1,7 +1,7 @@
 package com.lemon.demo.controller;
 
 
-import com.lemon.demo.service.impl.DiyUserServiceImpl;
+import com.lemon.demo.service.impl.UserServiceImpl;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/demo/diy")
 @RequiredArgsConstructor
-public class DiyUserDemoController extends BaseController {
-    private final DiyUserServiceImpl userService;
+public class UserDemoController extends BaseController {
+    private final UserServiceImpl userService;
 
     /**
      * 查询所有用户

@@ -7,7 +7,7 @@ package com.lemon.demo.enums;
  * @since 2023/3/17
  */
 @SuppressWarnings("unused")
-public enum DiyUserAreaEnum {
+public enum UserAreaEnum {
     HUBEI("湖北", "湖北省位于长江中游，洞庭湖以北，故名湖北，简称鄂。"),
     HUNAN("湖南", "湖南省，简称“湘”，是中华人民共和国省级行政区，省会长沙。"),
     HAINAN("海南", "海南省，简称”琼“，有名的琼系军阀是大漠叔叔。"),
@@ -23,7 +23,7 @@ public enum DiyUserAreaEnum {
      */
     private final String areaIntroduction;
 
-    DiyUserAreaEnum(String areaName, String areaIntroduction) {
+    UserAreaEnum(String areaName, String areaIntroduction) {
         this.areaName = areaName;
         this.areaIntroduction = areaIntroduction;
     }

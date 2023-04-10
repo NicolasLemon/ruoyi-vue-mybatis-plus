@@ -1,8 +1,8 @@
 package com.lemon.demo.service.impl;
 
-import com.lemon.demo.domain.DiyUser;
-import com.lemon.demo.mapper.DiyUserMapper;
-import com.lemon.demo.service.DiyUserService;
+import com.lemon.demo.domain.User;
+import com.lemon.demo.mapper.UserMapper;
+import com.lemon.demo.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2023/03/16
  */
 @Service
-public class DiyUserServiceImpl extends ServiceImpl<DiyUserMapper, DiyUser> implements DiyUserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
 }

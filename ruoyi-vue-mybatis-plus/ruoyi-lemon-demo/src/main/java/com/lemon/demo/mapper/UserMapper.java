@@ -1,7 +1,7 @@
 package com.lemon.demo.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.lemon.demo.domain.DiyUser;
+import com.lemon.demo.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.common.annotation.MapperEnhancement;
 import org.apache.ibatis.annotations.*;
@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2023/03/16
  */
 @Mapper
-public interface DiyUserMapper extends BaseMapper<DiyUser> {
+public interface UserMapper extends BaseMapper<User> {
     /**
      * 查询所有用户
      */
@@ -36,7 +36,7 @@ public interface DiyUserMapper extends BaseMapper<DiyUser> {
         2、@Param("ew") （ew不能更改成其它）
      */
     @Select("select * from diy_user ${ew.customSqlSegment};")
-    List<DiyUser> selectList(@Param("ew") Wrapper<DiyUser> queryWrapper);
+    List<User> selectList(@Param("ew") Wrapper<User> queryWrapper);
 
     /**
      * 通过用户id查询用户
@@ -48,5 +48,5 @@ public interface DiyUserMapper extends BaseMapper<DiyUser> {
     })
     @MapperEnhancement
     @Select("select * from diy_user where user_id=#{id};")
-    DiyUser selectById(Serializable id);
+    User selectById(Serializable id);
 }

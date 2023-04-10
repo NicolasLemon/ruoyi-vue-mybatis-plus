@@ -1,7 +1,7 @@
 package com.lemon.demo.aspect;
 
-import com.lemon.demo.domain.DiyUserArea;
-import com.lemon.demo.enums.DiyUserAreaEnum;
+import com.lemon.demo.domain.UserArea;
+import com.lemon.demo.enums.UserAreaEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -25,7 +25,7 @@ import java.util.List;
 @Component
 @Slf4j
 @SuppressWarnings("rawtypes")
-public class DiyDemoMapperAspect {
+public class UserMapperAspect {
 
     /**
      * 切点：在Mapper方法上使用注解 @MapperEnhancement
@@ -40,7 +40,7 @@ public class DiyDemoMapperAspect {
      * 1、在Mapper方法上使用@MapperEnhancement注解
      * 2、注解只有在DiyUserMapper中才切入此方法
      */
-    @Around("mapperPointcut() && execution(* com.lemon.demo.mapper.DiyUserMapper.*(..))")
+    @Around("mapperPointcut() && execution(* com.lemon.demo.mapper.UserMapper.*(..))")
     public Object aroundDiyUserMapper(ProceedingJoinPoint joinPoint) throws Throwable {
         // 获取切入的方法名称
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -75,10 +75,10 @@ public class DiyDemoMapperAspect {
         // 设置字段权限，不然无法读取private属性的字段的值
         field.setAccessible(true);
         // 将字段转换成需要的实体对象
-        DiyUserArea userArea = (DiyUserArea) field.get(object);
+        UserArea userArea = (UserArea) field.get(object);
         // 循环区域枚举类，赋值对用的区域简介
-        DiyUserAreaEnum[] values = DiyUserAreaEnum.values();
-        for (DiyUserAreaEnum value : values) {
+        UserAreaEnum[] values = UserAreaEnum.values();
+        for (UserAreaEnum value : values) {
             if (!value.getAreaName().equals(userArea.getAreaName())) {
                 continue;
             }

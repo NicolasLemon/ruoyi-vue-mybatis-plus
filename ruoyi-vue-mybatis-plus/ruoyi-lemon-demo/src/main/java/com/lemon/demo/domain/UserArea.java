@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @TableName("diy_user_area")
-public class DiyUserArea implements Serializable {
+public class UserArea implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,7 +50,7 @@ public class DiyUserArea implements Serializable {
         *********************
      */
 
-    public DiyUserArea(Long areaId, String areaName) {
+    public UserArea(Long areaId, String areaName) {
         this.areaId = areaId;
         this.areaName = areaName;
     }
