@@ -78,7 +78,7 @@ public class CodeGenerator {
                     // 设置需要生成的表名（包含）
                     builder.addInclude(includeTables)
                             // 设置过滤表前缀
-                            .addTablePrefix("t_", "c_")
+                            .addTablePrefix("t_", "c_", "diy_")
                             // Controller策略配置
                             .controllerBuilder()
                             // 开启生成@RestController控制器

@@ -750,3 +750,35 @@ public class CodeGenerator {
 ```
 
 ![](README.assets/2023-04-05-03-00-57-image.png)
+
+# 应用篇
+
+## Postman测试后端
+
+参考文章：[用postman测试若依后端接口_若依框架postman测试url在哪_sherazade的博客-CSDN博客](https://blog.csdn.net/sherazade/article/details/119146155)
+
+如果不想要验证码的话，可以先前后端跑起来，然后在前端关闭验证码开关的配置，或者直接修改数据库表字段，改为false：
+
+![](README.assets/2023-04-13-17-50-00-image.png)
+
+在发送登录请求的时候，要注意以下配置：
+
+```json
+Content-Type:application/json;charset=UTF-8
+```
+
+![](README.assets/2023-04-13-17-47-00-image.png)
+
+经过上述的操作，就可以直接用账号密码模拟登录，然后获取token了
+
+![](README.assets/2023-04-13-17-51-20-image.png)
+
+## 账号管理大师
+
+* https://github.com/NicolasLemon/lemon-account-master
+
+上网时存在很多账号，账号一多，经常就忘了密码，又不想用别的方式或者云上存储，此项开发是帮助本地存储密码。数据库中是经过层层加密了的，破解不出来。
+
+（此项目还在开发中）
+
+![](README.assets/2023-04-13-17-37-20-image.png)

@@ -3,10 +3,9 @@ package com.lemon.demo.aspect;
 import com.lemon.demo.domain.UserArea;
 import com.lemon.demo.enums.UserAreaEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +23,6 @@ import java.util.List;
 @Aspect
 @Component
 @Slf4j
-@SuppressWarnings("rawtypes")
 public class UserMapperAspect {
 
     /**
@@ -40,6 +38,7 @@ public class UserMapperAspect {
      * 1、在Mapper方法上使用@MapperEnhancement注解
      * 2、注解只有在DiyUserMapper中才切入此方法
      */
+    @SuppressWarnings("rawtypes")
     @Around("mapperPointcut() && execution(* com.lemon.demo.mapper.UserMapper.*(..))")
     public Object aroundDiyUserMapper(ProceedingJoinPoint joinPoint) throws Throwable {
         // 获取切入的方法名称
@@ -58,6 +57,31 @@ public class UserMapperAspect {
         }
         // 增强用户区域实体对象，赋值区域简介
         makeDiyUserAreaIntroduction(result);
+        return result;
+    }
+
+    /**
+     * 前置增强，可以在业务前修改参数
+     */
+    @SuppressWarnings({"unused", "StatementWithEmptyBody"})
+    @Before("execution(* com.lemon.demo.mapper.UserAreaMapper.insert*(..)) || execution(* com.lemon.demo.mapper.UserAreaMapper.update*(..))")
+    public void doBeforeInsertOrUpdateAccount(JoinPoint point) {
+        // 获取对应参数
+        Object[] pointArgs = point.getArgs();
+        for (Object pointArg : pointArgs) {
+            // 在此处就可以修改对应的实体类参数了
+        }
+    }
+
+    /**
+     * 后置增强（未加切入点）
+     * 如果只是要实现上述@Around中的增强操作，其实也可以在这里处理
+     *
+     * @param result 已经完成业务后的返回值
+     */
+    @SuppressWarnings("unused")
+    @AfterReturning(returning = "result")
+    public Object doAfter(JoinPoint point, Object result) {
         return result;
     }
 
@@ -87,4 +111,5 @@ public class UserMapperAspect {
             break;
         }
     }
+
 }
